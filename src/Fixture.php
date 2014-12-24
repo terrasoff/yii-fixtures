@@ -2,14 +2,34 @@
 
 namespace terrasoff\yii\fixtures;
 
-class Fixture
+use CActiveRecord;
+
+abstract class Fixture
 {
-    public function run($arg = [])
+    /**
+     * @var ConsoleFixtureManager
+     */
+    private $_manager = null;
+
+    private $_models = [];
+
+    private function getManager()
     {
-        foreach ($this->fixtures as $fixtureName) {
-            if (method_exists($this, $fixtureName)) {
-                $this->{$fixtureName}();
-            }
+        return $this->_manager;
+    }
+
+    public function setReference($alias, $object)
+    {
+        $this->getManager()->setReference($alias, $object);
+    }
+
+    public function process()
+    {
+        /** @var CActiveRecord $model */
+        foreach ($this->_models as $model) {
+            $model->save();
         }
+
+        return true;
     }
 }
