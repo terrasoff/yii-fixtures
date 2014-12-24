@@ -14,7 +14,7 @@
   },
   "autoload": {
     "psr-4": {
-      "terrasoff\\yii\\fixtures": "src/"
+      "terrasoff\\yii\\fixtures\\": "src/"
     }
   }
 }
