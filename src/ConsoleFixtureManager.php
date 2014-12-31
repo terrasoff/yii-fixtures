@@ -16,14 +16,19 @@ class ConsoleFixtureManager extends CConsoleCommand
     public $fixtures = [];
 
     /**
-     * @param array $args
+     * @param bool $flush очищаем таблицу?
+     * @param string $fixture определенная фикстура (полный путь)
      */
-    public function run($arg = [])
+    public function actionLoad($flush = true, $fixture = null)
     {
-        foreach ($this->fixtures as $fixtureClass) {
+        $list = $fixture !== null
+            ? [$fixture]
+            : $this->fixtures;
+
+        foreach ($list as $fixtureClass) {
             /** @var Fixture $fixture */
             $fixture = new $fixtureClass;
-            $fixture->process();
+            $fixture->process($flush);
         }
     }
 
