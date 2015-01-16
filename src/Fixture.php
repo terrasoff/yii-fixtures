@@ -3,6 +3,8 @@
 namespace terrasoff\yii\fixtures;
 
 use CActiveRecord;
+use Closure;
+use Exception;
 
 abstract class Fixture
 {
@@ -23,7 +25,10 @@ abstract class Fixture
         $this->getManager()->setReference($alias, $object);
     }
 
-    public function addModel(CActiveRecord $model)
+    /**
+     * @param CActiveRecord|array $model
+     */
+    public function addModel($model)
     {
         $this->_models[] = $model;
     }
@@ -38,12 +43,32 @@ abstract class Fixture
         if (count($this->_models) > 0 && $flush) {
             /** @var CActiveRecord $model */
             $model = $this->_models[0];
-            $model->deleteAll();
+
+            is_array($model)
+                ? $model['model']->deleteAll()
+                : $model->deleteAll();
         }
 
-        /** @var CActiveRecord $model */
         foreach ($this->_models as $model) {
-            $model->save();
+            if (is_array($model)) {
+                if (!isset($model['model'])) {
+                    throw new Exception(
+                        'При сохранении элемента фикстуры не сконфигурирована модель.'.
+                        'Конфигурация модели задается ключом "model"'
+                    );
+                }
+
+                if ($model['model']->save()) {
+                    if (isset($model['afterSave']) && $model['afterSave'] instanceof Closure) {
+                        call_user_func_array($model['afterSave'], [
+                            $model['model']
+                        ]);
+                    }
+                }
+            } else {
+                /** @var CActiveRecord $model */
+                $model->save();
+            }
         }
 
         return true;
