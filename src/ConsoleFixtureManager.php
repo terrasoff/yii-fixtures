@@ -2,7 +2,9 @@
 
 namespace terrasoff\yii\fixtures;
 
+use CConsoleApplication;
 use CConsoleCommand;
+use CDbConnection;
 use Exception;
 use Yii;
 
@@ -17,13 +19,19 @@ class ConsoleFixtureManager extends CConsoleCommand
     public $fixtures = [];
     const CONFIG_SET = 'set';
 
+    public $connection = 'db';
+
     /**
      * @param string $set определенная фикстура (полный путь)
      * @param bool $flush очищаем таблицу?
      */
     public function actionLoad($set, $flush = true)
     {
+        /** @var CDbConnection $db */
+        $db = $this->getApp()->getComponent('db');
+        $db->createCommand("SET foreign_key_checks = 0;")->execute();
         $this->load($set, $flush);
+        $db->createCommand("SET foreign_key_checks = 1;")->execute();
     }
 
     /**
@@ -56,5 +64,13 @@ class ConsoleFixtureManager extends CConsoleCommand
     public function getReference($alias)
     {
         return $this->_references[$alias];
+    }
+
+    /**
+     * @return CConsoleApplication
+     */
+    public function getApp()
+    {
+        return Yii::app();
     }
 }
