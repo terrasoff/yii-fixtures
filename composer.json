@@ -8,9 +8,9 @@
       "email": "terrasoff@terrasoff.ru"
     }
   ],
-  "minimum-stability": "dev",
+  "minimum-stability": "stable",
   "require": {
-    "yiisoft/yii": "dev-master"
+    "yiisoft/yii": "~1.1"
   },
   "autoload": {
     "psr-4": {
